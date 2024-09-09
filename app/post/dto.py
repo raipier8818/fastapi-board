@@ -6,6 +6,7 @@ class CreatePostRequestDto(BaseModel):
     title: str
     content: str
 
+
 class CreatePostDto(CreatePostRequestDto):
     pass
 
