@@ -10,12 +10,13 @@ class UpdatePostRequestDto(CreatePostRequestDto):
     pass
 
 class UpdatePostDto(UpdatePostRequestDto):
-    id: str   
+    _id: str 
+    updatedAt: str
     
 class CreatePostDto(CreatePostRequestDto):
     author: str
-    created_at: str
+    createdAt: str
 
 class PostResponseDto(CreatePostDto):
     id: str
-    updated_at: Optional[str]
+    updatedAt: Optional[str]
