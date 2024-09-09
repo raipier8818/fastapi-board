@@ -26,6 +26,9 @@ class GoogleOauthConfig():
         self.GOOGLE_OAUTH_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH_CLIENT_SECRET')
         self.GOOGLE_OAUTH_CALLBACK_URI = os.getenv('GOOGLE_OAUTH_CALLBACK_URI')
         
+class SessionConfig():
+    def __init__(self) -> None:
+        self.SECRET_KEY = os.getenv('SECRET_KEY')
         
 class Config():
     def __init__(self) -> None:
@@ -33,5 +36,6 @@ class Config():
         self.mongodb = MongoDBConfig()
         self.redis = RedisConfig()
         self.google_oauth = GoogleOauthConfig()
+        self.session = SessionConfig()
 
 config = Config()
