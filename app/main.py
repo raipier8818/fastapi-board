@@ -5,22 +5,30 @@ from config import config
 from mongodb import mongodb
 import router.post as post
 
-@asynccontextmanager
-async def lifespan(app: FastAPI) -> Any:
-    print("Server started")
+# @asynccontextmanager
+# async def lifespan(app: FastAPI) -> Any:
+#     print("Server started")
+#     mongodb.connect()
+#     yield
+
+#     mongodb.close()
+#     print("Server stopped")
+
+def create_app():
+
+    app = FastAPI()
     mongodb.connect()
-    yield
+    app.include_router(post.router)
 
-    mongodb.close()
-    print("Server stopped")
+    @app.get("/")
+    def ok() -> str:
+        return "OK"
 
-app = FastAPI(lifespan=lifespan)
-app.include_router(post.router)
 
-@app.get('/info')
-def info():
-    return config.__dict__
+    @app.get("/info")
+    def info():
+        return config.__dict__
 
-@app.get("/")
-def ok() -> str:
-    return "OK"
+    return app
+
+app = create_app()
