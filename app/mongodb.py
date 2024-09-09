@@ -41,4 +41,4 @@ class MongoDBInMemory:
         return await self.db.list_collection_names()
 
 
-mongodb = config.app.ENV == "development" and MongoDBInMemory() or MongoDB()
+mongodb = config.app.ENV == "test" and MongoDBInMemory() or MongoDB()

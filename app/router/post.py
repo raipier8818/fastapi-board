@@ -1,14 +1,15 @@
 import datetime
 from bson import ObjectId
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 
+from guard import local_auth_guard
 from model.post import CreatePostDto, CreatePostRequestDto, PostResponseDto, UpdatePostDto, UpdatePostRequestDto
 from mongodb import mongodb
 
 router = APIRouter(prefix="/post")
 
 @router.get("/")
-async def get_all_post():
+async def get_all_post(request: Request):
     post_collection = mongodb.collection("posts")
     post_cursor = post_collection.find({})
     posts = []
@@ -42,12 +43,13 @@ def get_post(id: str):
     )
 
 @router.post("/")
-def create_post(post: CreatePostRequestDto):
+@local_auth_guard
+def create_post(request: Request, post: CreatePostRequestDto):
     # extract author from session
     post = CreatePostDto(
         title=post.title,
         content=post.content,
-        author="temp",
+        author= request.session.get("user").get("name"),
         createdAt=datetime.datetime.now().isoformat(),
     )
     
@@ -57,14 +59,28 @@ def create_post(post: CreatePostRequestDto):
     return {"id": str(post_id)}
 
 @router.put("/{id}")
-def update_post(id: str, post: UpdatePostRequestDto):
+@local_auth_guard
+def update_post(request: Request, id: str, post: UpdatePostRequestDto): 
+    author = request.session.get("user").get("name")
     post_collection = mongodb.collection("posts")
-    post_collection.find_one_and_update({'_id': ObjectId(id)}, {"$set": post.model_dump()})
+    result = post_collection.update_one(
+        {"_id": ObjectId(id), "author": author},
+        {"$set": post.model_dump()}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Not Found")
     
     return {"id": id}
 
 @router.delete("/{id}")
-def delete_post(id: str):
+@local_auth_guard
+def delete_post(request: Request, id: str):
+    author = request.session.get("user").get("name")
     post_collection = mongodb.collection("posts")
-    post_collection.delete_one({"id": id})
+    result = post_collection.delete_one({"id": id, "author": author})
+
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Not Found")
+    
     return {"id": id}

@@ -19,6 +19,7 @@ def test_create_post():
 
 def test_get_post():
     response = client.get("/post/")
+    assert response.status_code == 200
     post_id = response.json()[0]["id"]
     response = client.get(f"/post/{post_id}")
     assert response.status_code == 200
@@ -28,6 +29,7 @@ def test_get_post():
     
 def test_update_post():
     response = client.get("/post/")
+    assert response.status_code == 200
     post_id = response.json()[0]["id"]
     response = client.put(f"/post/{post_id}", json={"title": "test2", "content": "test2"})
     assert response.status_code == 200
@@ -35,6 +37,7 @@ def test_update_post():
 
 def test_delete_post():
     response = client.get("/post/")
+    assert response.status_code == 200
     post_id = response.json()[0]["id"]
     response = client.delete(f"/post/{post_id}")
     assert response.status_code == 200
